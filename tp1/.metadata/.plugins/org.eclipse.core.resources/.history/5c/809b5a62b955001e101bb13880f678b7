@@ -1,0 +1,133 @@
+
+import java.net.*;
+import java.io.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.Scanner;
+
+
+public class Server 
+{
+	private static ServerSocket listener;
+	
+	private static final String IP_ADDRESS_PATTERN =
+	        "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
+
+	private static final Pattern pattern = Pattern.compile(IP_ADDRESS_PATTERN);
+
+    public static boolean validateIPAddress(String ipAddress) {
+        Matcher matcher = pattern.matcher(ipAddress);
+        return matcher.matches();
+    }
+    
+    public static boolean validatePort(int port) {
+        if( port>=5000 && port<=5050 )
+        	return true ;
+        return false ;
+    }
+	
+	public static void main(String[] args) throws Exception 
+	{
+		String serverAddress = "127.0.0.1";
+		int serverPort = 5000 ;
+		
+		
+		
+		listener = new ServerSocket();
+		listener.setReuseAddress(true);
+		InetAddress serverIP = InetAddress.getByName(serverAddress);
+		listener.bind(new InetSocketAddress(serverIP,serverPort));
+		System.out.format("the server is running%s:%d%n",serverAddress, serverPort);
+		
+		
+		int clientNumber= 0 ;
+		
+		boolean isValid = false ;
+		Scanner scanner = new Scanner(System.in);
+		while (!isValid) {
+			
+
+	        System.out.print("Veuillez entrer votre addresse IP : ");
+	        String ipAddress = scanner.nextLine();
+	        if(validateIPAddress(ipAddress))
+	        {
+	        	isValid = true;
+	        }
+	        else {
+		        System.out.print("Votre addresse IP est invalide! ");
+
+	        }
+	        
+		}
+		isValid = false ;
+		while (!isValid) {
+			System.out.print("Veuillez entrer votre numero de port : ");
+	        int port = scanner.nextInt();
+	        if(validatePort(port)) {
+	        	isValid = true ;
+	        }
+	        else {
+	        	System.out.print("Votre numero de port est invalide! ");
+	        }
+	        
+		}
+		
+		
+		
+		try 
+		{
+			while(true) 
+			{
+				new ClientHandler(listener.accept(),clientNumber++).start();
+			}
+		}
+		finally 
+		{
+			listener.close();
+		}
+	}
+	
+	
+	public static class ClientHandler extends Thread 
+	{
+		private Socket socket ;
+		private int clientNumber ;
+		public ClientHandler(Socket socket, int clientNumber)
+		{
+			this.socket = socket ;
+			this.clientNumber = clientNumber ;
+			System.out.println("New connection with client#" + clientNumber + " at "+ socket);
+		}
+		
+		public void run() 
+		{
+			try 
+			{
+				DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+				out.writeUTF("Hello from server - you are client#" + clientNumber);	
+			}
+			
+			catch (IOException e )
+			{
+				System.out.println("Error handling client#" + clientNumber + " : " + e);
+				
+			}
+			finally 
+			{
+				try 
+				{
+					socket.close();
+				}
+				catch (IOException e) 
+				{
+					System.out.println("Could not close socket") ;
+				}
+				
+				System.out.println("Connection with client#" + clientNumber + " closed");
+			}
+			
+		}
+	}
+	
+}
+

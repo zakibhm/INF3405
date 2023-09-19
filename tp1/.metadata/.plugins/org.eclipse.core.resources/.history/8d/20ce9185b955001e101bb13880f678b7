@@ -1,0 +1,76 @@
+
+import java.net.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.io.*;
+import java.util.Scanner;
+
+public class Client {
+	
+	private static Socket socket;
+	
+	private static final String IP_ADDRESS_PATTERN =
+	        "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
+
+	private static final Pattern pattern = Pattern.compile(IP_ADDRESS_PATTERN);
+
+    public static boolean validateIPAddress(String ipAddress) {
+        Matcher matcher = pattern.matcher(ipAddress);
+        return matcher.matches();
+    }
+    
+    public static boolean validatePort(int port) {
+        if( port>=5000 && port<=5050 )
+        	return true ;
+        return false ;
+    }
+	
+	public static void main(String[] args) throws Exception
+	{
+		
+		boolean isValid = false ;
+		Scanner scanner = new Scanner(System.in);
+		while (!isValid) {
+			
+
+	        System.out.print("Veuillez entrer votre addresse IP : ");
+	        String ipAddress = scanner.nextLine();
+	        if(validateIPAddress(ipAddress))
+	        {
+	        	isValid = true;
+	        }
+	        else {
+		        System.out.print("Votre addresse IP est invalide! ");
+
+	        }
+	        
+		}
+		isValid = false ;
+		while (!isValid) {
+			System.out.print("Veuillez entrer votre numero de port : ");
+	        int port = scanner.nextInt();
+	        if(validatePort(port)) {
+	        	isValid = true ;
+	        }
+	        else {
+	        	System.out.print("Votre numero de port est invalide! ");
+	        }
+	        
+		}
+		
+		scanner.close();
+		
+		String serverAddress = "127.0.0.1";
+		int serverPort = 5000 ;
+		
+		socket = new Socket(serverAddress, serverPort);
+		System.out.format("the server is running%s:%d%n",serverAddress, serverPort);
+		
+		DataInputStream in = new DataInputStream(socket.getInputStream());
+		
+		String helloMessageFromServer = in.readUTF();
+		System.out.println(helloMessageFromServer);
+		
+		socket.close();
+	}
+}

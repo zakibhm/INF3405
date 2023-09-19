@@ -1,0 +1,101 @@
+
+import java.net.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.io.*;
+import java.util.Scanner;
+
+public class Client {
+	
+	private static Socket socket;
+	
+	private static final String IP_ADDRESS_PATTERN =
+	        "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
+
+	private static final Pattern pattern = Pattern.compile(IP_ADDRESS_PATTERN);
+
+    public static boolean validateIPAddress(String ipAddress) {
+        Matcher matcher = pattern.matcher(ipAddress);
+        return matcher.matches();
+    }
+    
+    public static boolean validatePort(int port) {
+        if( port>=5000 && port<=5050 )
+        	return true ;
+        return false ;
+    }
+	
+	public static void main(String[] args) throws Exception
+	{
+		
+		boolean isValid = false ;
+		Scanner scanner = new Scanner(System.in);
+		String serverAddress = null;
+        int serverPort = 0;
+			while (!isValid) {
+				
+		        System.out.print("Veuillez entrer l'addresse IP du serveur : \n");
+		        serverAddress = scanner.nextLine();
+		        if(validateIPAddress(serverAddress))
+		        {
+		        	isValid = true;
+		        }
+		        else {
+			        System.out.print("Addresse IP est invalide! \n");
+
+		        }
+		        
+			}
+			isValid = false ;
+			while (!isValid) {
+				System.out.print("Veuillez entrer le numero de port du serveur: \n");
+		        serverPort = scanner.nextInt();
+		        if(validatePort(serverPort)) {
+		        	isValid = true ;
+		        }
+		        else {
+		        	System.out.print("Numero de port est invalide! \n");
+		        }
+		        
+			}
+			socket = new Socket(serverAddress, serverPort);
+			System.out.format("Connexion au serveur %s:%d%n",serverAddress, serverPort);
+			scanner.nextLine(); // Consume the newline character
+
+	        System.out.print("Veuillez entrer votre nom d'utilisateur : \n");
+	        String username = scanner.nextLine();
+
+	        System.out.print("Veuillez entrer votre mot de passe : \n");
+	        String password = scanner.nextLine();
+			
+	        // Send username and password to the server
+	        
+	        DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+	        out.writeUTF(username);
+	        out.writeUTF(password);
+				
+			
+			
+			DataInputStream in = new DataInputStream(socket.getInputStream());
+	        String response = in.readUTF();
+	        
+	        
+			// Process the response
+	        if (response.equals("SUCCEE")) {
+	            System.out.println("Authentification reussite.\n");
+				
+	        }
+	        else if(response.equals("NOUVEAU")) {
+	        	System.out.println("Creation d'un nouveau utilisateur.\n");
+	        } 
+	        else {
+	            System.out.println("Erreur dans la saisie du mot de passe\n Connexion rejetee");
+	            socket.close(); // Close the socket if authentication fails
+	        }
+	        System.out.println("COnnexion au service de traitment d'image.\n");
+//			System.out.print("Veuillez entrer le nom de l'image que vous voulez l'envoyer : \n");
+	        String imageName = scanner.nextLine();
+			scanner.close();
+			socket.close();
+	}
+}

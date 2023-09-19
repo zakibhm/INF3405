@@ -1,0 +1,24 @@
+
+import java.net.*;
+import java.io.*;
+
+public class Client {
+	
+	private static Socket socket;
+	
+	public static void main(String[] args) throws Exception
+	{
+		String serverAddress = "127.0.0.1";
+		int serverPort = 5000 ;
+		
+		socket = new Socket(serverAddress, serverPort);
+		System.out.format("the server is running%s:%d%n",serverAddress, serverPort);
+		
+		DataInputStream in = new DataInputStream(socket.getInputStream());
+		
+		String helloMessageFromServer = in.readUTF();
+		System.out.println(helloMessageFromServer);
+		
+		socket.close();
+	}
+}
