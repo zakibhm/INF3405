@@ -1,6 +1,5 @@
 
 import java.net.*;
-import java.nio.file.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.io.*;
@@ -96,39 +95,32 @@ public class Client {
 	        System.out.println("COnnexion au service de traitment d'image.\n");
 			System.out.print("Veuillez entrer le nom de l'image que vous voulez l'envoyer : \n");
 	        String imageName = scanner.nextLine();
-	        
-	        String imagePath = Paths.get(imageName).toAbsolutePath().toString();
-	        System.out.format("image path : %s\n",imagePath);
-	        
-	        
-	        File file = new File(imagePath);
-	        System.out.println(!file.exists());
-	        imageName = scanner.nextLine();
-//
-//            if (!file.exists()) {
-//                System.out.println("Image non trouvee!");
-//                return;
-//            }
-//
-//            // Read the image file as binary data
-//            out.writeUTF(imageName);
-//            byte[] imageData = new byte[(int) file.length()];
-//            FileInputStream fis = new FileInputStream(file);
-//            fis.read(imageData);
-//            fis.close();
-//            try {
-//            	out.write(imageData);
-//            }
-//            catch (IOException e) {
-//            	System.out.println("Could not send Image") ;
-//            }
-//            System.out.println("Image was sent successfully to the server") ;
-//            out.flush();
-//            out.close();
-//            
-//            
-//            
-//            
+	        File file = new File(imageName);
+
+            if (!file.exists()) {
+                System.out.println("Image non trouvee!");
+                return;
+            }
+
+            // Read the image file as binary data
+            out.writeUTF(imageName);
+            byte[] imageData = new byte[(int) file.length()];
+            FileInputStream fis = new FileInputStream(file);
+            fis.read(imageData);
+            fis.close();
+            try {
+            	out.write(imageData);
+            }
+            catch (IOException e) {
+            	System.out.println("Could not send Image") ;
+            }
+            System.out.println("Image was sent successfully to the server") ;
+            out.flush();
+            out.close();
+            
+            
+            
+            
 			scanner.close();
 			socket.close();
 	}

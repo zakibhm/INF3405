@@ -99,11 +99,8 @@ public class Client {
 	        
 	        String imagePath = Paths.get(imageName).toAbsolutePath().toString();
 	        System.out.format("image path : %s\n",imagePath);
-	        
-	        
-	        File file = new File(imagePath);
-	        System.out.println(!file.exists());
-	        imageName = scanner.nextLine();
+
+//	        File file = new File(imagePath);
 //
 //            if (!file.exists()) {
 //                System.out.println("Image non trouvee!");

@@ -36,22 +36,6 @@ public class Server
         	return true ;
         return false ;
     }
-    
-    public static void loadDatabaseFromCSV() {
-	    try (BufferedReader reader = new BufferedReader(new FileReader("user_database.csv"))) {
-	        String line;
-	        while ((line = reader.readLine()) != null) {
-	            String[] parts = line.split(",");
-	            if (parts.length == 2) {
-	                usersDatabase.put(parts[0], parts[1]);
-	            }
-	        }
-	        System.out.println("Database loaded from CSV.");
-	    } catch (IOException e) {
-	        System.err.println("Error loading database from CSV: " + e.getMessage());
-	    }
-	}
-    
         
 	
 	public static void main(String[] args) throws Exception 
@@ -100,9 +84,6 @@ public class Server
 		
 		listener.bind(new InetSocketAddress(serverIP,serverPort));
 		System.out.format("the server is running %s:%d%n",serverAddress, serverPort);
-		
-		//loading the dataBase
-		loadDatabaseFromCSV();
 		
 		try 
 		{
@@ -160,10 +141,6 @@ public class Server
 					//Creation d'un nouveau utilisateur
 					
 					usersDatabase.put(username, password);
-					
-					//saving user iformations in the CSV file
-					saveDatabaseToCSV();
-					
 					out.writeUTF("NOUVEAU");
 				}
 				else {
