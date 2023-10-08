@@ -35,27 +35,25 @@ public class Client {
 	static void readServerInfo() {
 		boolean isValid = false;
 		while (!isValid) {
-
-			System.out.print("Veuillez entrer l'addresse IP du serveur : \n");
+			System.out.println("Please enter the server's IP address: ");
 			serverAddress = scanner.nextLine();
 			if (validateIPAddress(serverAddress)) {
 				isValid = true;
 			} else {
-				System.out.print("Addresse IP est invalide! \n");
-
+				System.out.println("Invalid IP address! Please try again.");
 			}
-
 		}
+
 		isValid = false;
+
 		while (!isValid) {
-			System.out.print("Veuillez entrer le numero de port du serveur: \n");
+			System.out.println("Please enter the server's port number: ");
 			serverPort = scanner.nextInt();
 			if (validatePort(serverPort)) {
 				isValid = true;
 			} else {
-				System.out.print("Numero de port est invalide! \n");
+				System.out.println("Invalid port number! Please try again.");
 			}
-
 		}
 
 	}
@@ -65,18 +63,17 @@ public class Client {
 		try {
 			socket = new Socket(serverAddress, serverPort);
 			out = new DataOutputStream(socket.getOutputStream());
-			System.out.format("Connexion au serveur %s:%d%n", serverAddress, serverPort);
-			scanner.nextLine(); // Consume the newline character
+			System.out.format("Connecting to the server %s:%d%n", serverAddress, serverPort);
+			scanner.nextLine();
 		} catch (IOException e) {
-			// Handle other IO-related exceptions
 			e.printStackTrace();
 			return false;
 		}
 
-		System.out.print("Veuillez entrer votre nom d'utilisateur : \n");
+		System.out.println("Please enter your username: ");
 		String username = scanner.nextLine();
 
-		System.out.print("Veuillez entrer votre mot de passe : \n");
+		System.out.println("Please enter your password: ");
 		String password = scanner.nextLine();
 
 		// Send username and password to the server
@@ -91,35 +88,33 @@ public class Client {
 		try {
 			DataInputStream in = new DataInputStream(socket.getInputStream());
 			serverAnswer = in.readUTF();
-
-			// verify the User information
-			loggingVerification(serverAnswer);
 		} catch (IOException e) {
 			System.out.println("Could not read an answer from the server");
 			return false;
 		}
-		return true;
+		return loggingVerification(serverAnswer);
 	}
 
-	static void loggingVerification(String answer) {
+	// Reading the server answer and verifying it
+	static boolean loggingVerification(String answer) {
 		if (answer.equals("SUCCESS")) {
 			System.out.println("Authentication successful.\n");
+			return true;
 
 		} else if (answer.equals("NEW")) {
-			System.out.println("Authentication successful.\n");
+			System.out.println("Creating new account.\n");
+			return true;
 		} else {
 			System.out.println("Error in password entry.\n Connection rejected");
-
-			try {
-				socket.close();// Close the socket if authentication fails
-			} catch (IOException e) {
-				System.out.println("Could not close the socket");
-			}
+			return false;
 		}
-		System.out.println("Connexion au service de traitment d'image.\n");
+
 	}
 
 	static Object[] readImage() {
+
+		System.out.println("Connecting to the image processing service.");
+
 		Object[] result = new Object[2];
 		System.out.print("Veuillez entrer le nom de l'image que vous voulez l'envoyer : \n");
 		String imageName = scanner.nextLine();
@@ -136,6 +131,7 @@ public class Client {
 		try {
 			// Send the image file name to the server
 			out.writeUTF(imageName);
+
 			// Read the image file as binary data
 			byte[] imageData = new byte[(int) file.length()];
 			try {
@@ -167,11 +163,13 @@ public class Client {
 			int imageDataLength = in.readInt();
 			byte[] imageData = new byte[imageDataLength];
 			in.readFully(imageData);
+			in.close();
 			System.out.println("Sobel image received from the server");
 
 			// Construct the full path of the Sobel image
 			File sobelImageFile = new File(sobelImageName);
 			String sobelImagePath = sobelImageFile.getAbsolutePath();
+
 			// Get the parent directory (folder) path
 			String parentFolderPath = new File(sobelImagePath).getParent();
 

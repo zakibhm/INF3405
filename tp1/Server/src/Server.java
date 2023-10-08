@@ -24,14 +24,6 @@ public class Server {
 	private static int serverPort = 0;
 	private static String serverAddress = null;
 
-	public static boolean validateUser(String username, String password) {
-
-		// Vérifie si l'utilisateur existe et si le mot de passe correspond
-
-		String storedPassword = usersDatabase.get(username);
-		return storedPassword != null && storedPassword.equals(password);
-	}
-
 	public static boolean validateIPAddress(String serverAddress) {
 
 		Matcher matcher = pattern.matcher(serverAddress);
@@ -66,29 +58,27 @@ public class Server {
 
 		boolean isValid = false;
 		Scanner scanner = new Scanner(System.in);
-		String serverAddress = null;
-		int serverPort = 0;
 
 		while (!isValid) {
 
-			System.out.print("Veuillez entrer l'addresse IP du poste sur lequel s'éxecute le serveur  : \n");
+			System.out.println("Please enter the IP address of the machine running the server: ");
+
 			serverAddress = scanner.nextLine();
 			if (validateIPAddress(serverAddress)) {
 				isValid = true;
 			} else {
-				System.out.print("Addresse IP est invalide! \n");
-
+				System.out.println("Invalid IP address! Please try again.");
 			}
 
 		}
 		isValid = false;
 		while (!isValid) {
-			System.out.print("Veuillez entrer le numero de port d’écoute: \n");
+			System.out.println("Please enter the listening port number: ");
 			serverPort = scanner.nextInt();
 			if (validatePort(serverPort)) {
 				isValid = true;
 			} else {
-				System.out.print("Numero de port est invalide! \n");
+				System.out.println("Invalid port number! Please try again.");
 			}
 
 		}
@@ -291,6 +281,8 @@ public class Server {
 			imageHandler(userInfo[0]);
 
 			try {
+				out.close();
+				in.close();
 				socket.close();
 			} catch (IOException e) {
 				System.out.println("Could not close socket");
